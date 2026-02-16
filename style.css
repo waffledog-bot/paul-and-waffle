@@ -237,6 +237,39 @@ footer a:hover {
   color: #484f58 !important;
 }
 
+/* Summary example */
+.example-summary blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 16px;
+  margin: 12px 0 8px;
+}
+
+.example-summary blockquote p {
+  color: var(--text-muted) !important;
+  font-size: 0.88rem !important;
+  line-height: 1.7;
+  margin-bottom: 10px !important;
+}
+
+.example-summary blockquote p:last-child {
+  margin-bottom: 0 !important;
+}
+
+.summary-source {
+  font-size: 0.8rem !important;
+  color: #484f58 !important;
+  margin-bottom: 8px !important;
+}
+
+.summary-source a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.summary-source a:hover {
+  text-decoration: underline;
+}
+
 /* Skill links */
 .skill-link {
   margin-bottom: 12px !important;

@@ -221,6 +221,15 @@
       </div>
       <div class="task-details">
         <p>The <code>summarize</code> CLI extracts transcripts from YouTube URLs. For long videos, we use <code>--extract-only</code> to get the transcript, then summarize in-context to avoid OOM kills.</p>
+        <div class="media-showcase example-summary">
+          <p class="media-label">📝 Example: TFTC podcast summary</p>
+          <p class="summary-source">Source: <a href="https://www.youtube.com/watch?v=iDNlOGn1bTw">TFTC #647 — Justin Moon on AI, Freedom Tech & Building with LLMs</a> (2,733-line transcript → 3 paragraphs)</p>
+          <blockquote>
+            <p>Justin Moon is back after a year away from building. In that time, AI changed the game — he sat down and in 24 hours, vibe-coding with LLMs, built what used to take him a month. But the real conversation goes deeper: the most important human trait going forward isn't intelligence, it's will. It's agency. If AI can code, write, and think, what matters is having the vision and drive to point it somewhere meaningful.</p>
+            <p>They talk a lot about freedom tech — Nostr, Bitcoin, running local models, self-hosting your AI so you're not dependent on some company that can pull the rug. Justin's been working on protocols like Marmet and White Noise (encrypted relay-based communication). And Marty, who's not a programmer, talks about using OpenClaw to handle real business tasks — which is the whole point: you don't need to be a dev anymore to build things.</p>
+            <p>The vibe is optimistic but grounded. They're honest about the existential weirdness of AI, but they see this as a moment to build tools that give people sovereignty.</p>
+          </blockquote>
+        </div>
         <h3>How it works</h3>
         <ul>
           <li><code>summarize --extract-only "youtube-url"</code> → raw transcript</li>
@@ -255,6 +264,47 @@ sudo pmset -a disablesleep 0   # off</code></pre>
           <li><strong>Requires sudo.</strong> The agent can't run this without elevated permissions or your password.</li>
           <li><strong>Turn it off when done!</strong> Your Mac won't sleep at all with the lid closed — battery drain is real.</li>
           <li>Works on macOS Tahoe (26.x). No external display or keyboard required.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="task" id="this-website">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">09</span>
+          <h2>This Website</h2>
+        </div>
+        <p class="task-summary">Meta: how an AI built, reviewed, and deployed the site you're reading right now.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>Paul said "let's make a website that chronicles our work together." Waffle wrote the HTML and CSS, deployed it to Vercel, then used the Chrome extension to actually look at what it built and fix the layout.</p>
+        <h3>The process</h3>
+        <ol>
+          <li>Wrote the site as plain HTML + CSS — no framework, no build step</li>
+          <li>Opened it in Chrome via the OpenClaw browser extension</li>
+          <li>Took a screenshot, reviewed it, and noticed the layout was right-aligned (oops)</li>
+          <li>Fixed the CSS, refreshed, re-screenshotted — iteration loop just like a human developer</li>
+          <li>Paul pointed out spacing issues from a screenshot — fixed those too</li>
+          <li>Deployed to Vercel with <code>npx vercel --prod</code></li>
+          <li>Created a GitHub repo with <code>gh repo create</code> and pushed</li>
+          <li>Added sanitized skills to the repo (stripped personal data, hardcoded paths)</li>
+        </ol>
+        <h3>Key insight</h3>
+        <p>The Chrome extension was the unlock. Without it, Waffle was building a website blind — writing HTML but never seeing the result. With it, the agent can screenshot, review, and iterate just like looking over someone's shoulder. The feedback loop went from "Paul, does this look right?" to "I can see it's broken, let me fix it."</p>
+        <h3>Stack</h3>
+        <ul>
+          <li><strong>Site:</strong> Plain HTML + CSS, no framework, no build step</li>
+          <li><strong>Hosting:</strong> Vercel (free tier, CLI deploy)</li>
+          <li><strong>Source:</strong> <a href="https://github.com/waffledog-bot/paul-and-waffle">GitHub repo</a> with skills included</li>
+          <li><strong>Design review:</strong> OpenClaw Chrome extension (browser screenshots)</li>
+        </ul>
+        <h3>Gotchas</h3>
+        <ul>
+          <li><strong>Vercel needs <code>vercel login</code> first.</strong> Can't deploy without it — the agent can't do the OAuth flow for you.</li>
+          <li><strong>GitHub too:</strong> <code>gh auth login</code> required before the agent can create repos and push.</li>
+          <li>Media files (audio, video) add up fast — this site is ~25MB mostly from stem MP3s and the music video.</li>
+          <li>Keep skills sanitized before committing — strip phone numbers, API keys, and hardcoded user paths.</li>
         </ul>
       </div>
     </section>
