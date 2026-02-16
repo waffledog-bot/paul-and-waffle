@@ -237,6 +237,27 @@ footer a:hover {
   color: #484f58 !important;
 }
 
+/* Skill links */
+.skill-link {
+  margin-bottom: 12px !important;
+}
+
+.skill-link a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  background: var(--accent-dim);
+  border-radius: 6px;
+  border: 1px solid rgba(240, 165, 0, 0.2);
+  transition: background 0.2s;
+}
+
+.skill-link a:hover {
+  background: rgba(240, 165, 0, 0.2);
+}
+
 /* Media showcases */
 .media-showcase {
   margin: 16px 0;
