@@ -253,10 +253,47 @@
       </div>
     </section>
 
-    <section class="task" id="clamshell">
+    <section class="task" id="email-calendar">
       <div class="task-header" onclick="toggleTask(this)">
         <div>
           <span class="task-number">08</span>
+          <h2>Email & Calendar</h2>
+        </div>
+        <p class="task-summary">Gmail and Google Calendar access via the gog CLI — send emails, check inbox, create events with invites.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>The <code>gog</code> CLI (built-in OpenClaw skill) gives the agent access to Gmail, Calendar, and Contacts via Google OAuth. Waffle's first email was a recap of everything we built on day one.</p>
+        <h3>What it can do</h3>
+        <ul>
+          <li><strong>Gmail:</strong> Search, read, send, reply, draft — plain text or HTML</li>
+          <li><strong>Calendar:</strong> List events, create events with attendees and colors, update/delete</li>
+          <li><strong>Contacts:</strong> List and search contacts</li>
+        </ul>
+        <h3>Setup</h3>
+        <ol>
+          <li>Create a Google Cloud project and enable Gmail, Calendar, and People APIs</li>
+          <li>Create OAuth credentials (Desktop app) → download <code>client_secret.json</code></li>
+          <li>OAuth consent screen must be <strong>External</strong> (not Internal) for regular Gmail accounts</li>
+          <li><code>gog auth credentials /path/to/client_secret.json</code></li>
+          <li><code>gog auth add you@gmail.com --services gmail,calendar,contacts</code> → approve in browser</li>
+        </ol>
+        <h3>Spam strategy</h3>
+        <p>If your agent's email gets a lot of spam (ours does), set up a whitelist of addresses to actually pay attention to. Everything else gets ignored. We check email via heartbeats (~every 30 min) and only alert on whitelisted senders.</p>
+        <h3>Gotchas</h3>
+        <ul>
+          <li><strong>OAuth "Internal" mode blocks regular Gmail.</strong> You'll get "Error 403: org_internal". Switch to External and add yourself as a test user.</li>
+          <li><strong>APIs must be enabled individually</strong> in Google Cloud Console — Gmail API, Calendar API, People API. You'll get a 403 with a helpful link if you forget one.</li>
+          <li>Set <code>GOG_ACCOUNT=you@gmail.com</code> as an environment variable so you don't have to pass <code>--account</code> every time.</li>
+          <li>Calendar invites need <code>--attendees "email@example.com"</code> to actually send the invite to someone.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="task" id="clamshell">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">09</span>
           <h2>Clamshell Mode</h2>
         </div>
         <p class="task-summary">Keep the MacBook running with the lid closed — no external monitor needed.</p>
@@ -279,7 +316,7 @@ sudo pmset -a disablesleep 0   # off</code></pre>
     <section class="task" id="this-website">
       <div class="task-header" onclick="toggleTask(this)">
         <div>
-          <span class="task-number">09</span>
+          <span class="task-number">10</span>
           <h2>This Website</h2>
         </div>
         <p class="task-summary">Meta: how an AI built, reviewed, and deployed the site you're reading right now.</p>
