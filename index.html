@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paul & Waffle — Building with AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Paul & Waffle 🧇</h1>
+      <p class="subtitle">A human and an AI building stuff together over WhatsApp.</p>
+      <p class="intro">This is a living build log. Every card below is something we actually built, broke, fixed, or figured out — starting from a blank MacBook Air and an OpenClaw install. If you're setting up your own AI assistant, steal whatever's useful.</p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="task" id="the-setup">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">01</span>
+          <h2>The Setup</h2>
+        </div>
+        <p class="task-summary">OpenClaw on a MacBook Air, talking through WhatsApp selfChatMode.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>The whole thing runs on a MacBook Air (M-series, macOS Tahoe 26.2). OpenClaw is the agent framework — it gives Claude tools, memory, and the ability to talk to you through messaging apps.</p>
+        <h3>Key decisions</h3>
+        <ul>
+          <li><strong>WhatsApp over Signal:</strong> We went with WhatsApp in <code>selfChatMode</code> — the bot uses your own phone number, so you're literally texting yourself. No second phone number needed.</li>
+          <li><strong>Workspace as home base:</strong> Everything lives in <code>~/.openclaw/workspace/</code> — identity files, memory, skills, projects. The agent reads these on every boot.</li>
+          <li><strong>Identity files:</strong> <code>SOUL.md</code> (personality), <code>USER.md</code> (who you are), <code>IDENTITY.md</code> (who the agent is), <code>MEMORY.md</code> (long-term memory). These make the agent feel like <em>your</em> agent, not a generic chatbot.</li>
+        </ul>
+        <h3>Gotchas</h3>
+        <ul>
+          <li>Debug messages and tool errors were leaking into WhatsApp. Fixed with <code>messages.suppressToolErrors: true</code> and <code>tools.exec.notifyOnExit: false</code> in config.</li>
+          <li>Auto-transcription of voice memos never fired despite correct config. Manual transcription via the whisper-api skill works fine — we moved on rather than burning hours debugging.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="task" id="image-generation">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">02</span>
+          <h2>Image Generation</h2>
+        </div>
+        <p class="task-summary">Generate images with Gemini — Waffle's first act was creating its own avatar.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>The very first thing Waffle did after being born was generate its own self-portrait. Used the <code>nano-banana-pro</code> skill which wraps Google's Gemini image generation.</p>
+        <div class="media-showcase">
+          <img src="media/waffle-avatar.png" alt="Waffle's self-portrait — a golden waffle character with a lightbulb and gears" class="media-image">
+          <p class="media-caption">Waffle's self-portrait: "a golden waffle character with lightbulb and gears, creative and warm"</p>
+        </div>
+        <h3>How it works</h3>
+        <ul>
+          <li><code>nano-banana-pro</code> skill sends prompts to Gemini's image generation API</li>
+          <li>Returns images that can be sent via WhatsApp or saved to files</li>
+          <li>Good for avatars, app icons, concept art, visual brainstorming</li>
+        </ul>
+        <h3>Gotchas</h3>
+        <ul>
+          <li>Requires a Gemini API key configured in <code>skills.entries.nano-banana-pro.apiKey</code></li>
+          <li>Results vary a lot with prompt wording — be specific about style, mood, and composition</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="task" id="voice-memos">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">03</span>
+          <h2>Voice Memos</h2>
+        </div>
+        <p class="task-summary">Send voice messages from the AI via WhatsApp using ElevenLabs TTS.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>We wanted Waffle to be able to reply with voice notes — not just text. Built a <code>voice-memo</code> skill that generates audio with ElevenLabs and sends it as a WhatsApp voice note.</p>
+        <div class="media-showcase">
+          <audio controls src="media/voice-memo-test.mp3"></audio>
+          <p class="media-caption">Waffle's first voice memo — testing the ElevenLabs pipeline</p>
+        </div>
+        <h3>How it works</h3>
+        <ul>
+          <li><code>sag</code> CLI generates the audio (ElevenLabs TTS, v3 model)</li>
+          <li>Audio saved to workspace dir (not <code>/tmp/</code>!)</li>
+          <li>Sent via OpenClaw's message tool with <code>asVoice: true</code></li>
+        </ul>
+        <h3>Gotchas</h3>
+        <ul>
+          <li><strong><code>/tmp/</code> is not in allowed media directories.</strong> Files saved there can't be sent via WhatsApp. Always save to the workspace.</li>
+          <li>Default voice is "George" (Warm, Captivating Storyteller) — good for summaries and recaps.</li>
+          <li>ElevenLabs v3 supports audio tags like <code>[whispers]</code>, <code>[excited]</code>, <code>[laughs]</code> for expression.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="task" id="stem-splitting">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">04</span>
+          <h2>Stem Splitting</h2>
+        </div>
+        <p class="task-summary">Find a song on YouTube, download it, and split into vocals, drums, bass, and more.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>The <code>stem-split</code> skill ties together <code>yt-dlp</code> (download) and <code>demucs</code> (Meta's AI source separation) into one pipeline. Ask for "the instrumental of Big Iron" and it just works.</p>
+        <div class="media-showcase">
+          <p class="media-label">🎤 Vocals only</p>
+          <audio controls src="media/big-iron-vocals.mp3"></audio>
+          <p class="media-label">🎸 Instrumental (no vocals)</p>
+          <audio controls src="media/big-iron-instrumental.mp3"></audio>
+          <p class="media-caption">Marty Robbins — Big Iron, split into vocals and instrumental via Demucs</p>
+        </div>
+        <h3>The pipeline</h3>
+        <ol>
+          <li>Find the song: <code>yt-dlp --print title --print webpage_url "ytsearch1:song name"</code></li>
+          <li>Download audio: <code>yt-dlp -x --audio-format wav</code></li>
+          <li>Split stems: <code>demucs --two-stems vocals -n htdemucs --mp3</code></li>
+          <li>Send results via WhatsApp</li>
+        </ol>
+        <h3>Modes</h3>
+        <ul>
+          <li><strong>2stems:</strong> vocals + instrumental (karaoke mode)</li>
+          <li><strong>4stems:</strong> vocals, drums, bass, other</li>
+          <li><strong>5stems:</strong> vocals, drums, bass, piano, other</li>
+        </ul>
+        <h3>Gotchas</h3>
+        <ul>
+          <li><strong>Spleeter doesn't work on Apple Silicon.</strong> TensorFlow dependency is broken. Use <code>demucs</code> instead — it's PyTorch-based and produces better results anyway.</li>
+          <li><strong>Python 3.14 is too new for demucs.</strong> Install with <code>pipx install demucs==4.0.1 --python python3.11</code>.</li>
+          <li>First run downloads an ~80MB model. After that, processing takes ~50 seconds per song on M-series.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="task" id="music-generation">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">05</span>
+          <h2>Music Generation</h2>
+        </div>
+        <p class="task-summary">Generate original songs from text prompts — with lyrics, genre control, and full composition plans.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>The <code>music-gen</code> skill uses the ElevenLabs Music API. Two modes: quick prompt ("make me a lo-fi beat") or a detailed composition plan with per-section lyrics and styles.</p>
+        <div class="media-showcase">
+          <p class="media-label">🎵 Lo-fi test beat (quick prompt mode)</p>
+          <audio controls src="media/lofi-test.mp3"></audio>
+          <p class="media-label">🎭 "La Gaufre" — an opera about waffles (composition plan mode)</p>
+          <audio controls src="media/la-gaufre.mp3"></audio>
+          <p class="media-caption">Two approaches: simple prompt vs. detailed composition plan with per-section lyrics and styles</p>
+        </div>
+        <h3>Quick mode</h3>
+        <pre><code>bash scripts/music-gen.sh "upbeat indie rock about coding at 3am" --length 60</code></pre>
+        <h3>Composition plan mode</h3>
+        <p>For full control, write a JSON plan defining global styles, sections (verse/chorus/bridge), per-section lyrics, and durations. This is how we made "La Gaufre" — a 30-second opera about waffles with a baritone singing over sparse piano.</p>
+        <h3>Gotchas</h3>
+        <ul>
+          <li><strong>No copyrighted references.</strong> Mentioning "Puccini-style" got rejected. The API suggests alternatives — just strip the artist names and describe the sound instead.</li>
+          <li>Composition plan gives much better results than simple prompts for anything specific.</li>
+          <li>Use <code>negative_global_styles</code> to exclude what you don't want — "no drums", "no choir", etc.</li>
+          <li>Songs can be 3 seconds to 10 minutes. Sections: 3 seconds to 2 minutes each.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="task" id="music-videos">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">06</span>
+          <h2>Music Videos</h2>
+        </div>
+        <p class="task-summary">Generate video scenes with Sora, stitch them over the audio with ffmpeg.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>Once we had a song, we wanted visuals. OpenAI's Sora API generates 4/8/12-second video clips from text prompts. We generated 3 scenes in parallel and stitched them over the La Gaufre audio.</p>
+        <div class="media-showcase">
+          <video controls src="media/la-gaufre-video.mp4" poster="media/waffle-avatar.png"></video>
+          <p class="media-caption">La Gaufre — the music video. Three Sora-generated scenes stitched over the opera.</p>
+        </div>
+        <h3>The pipeline</h3>
+        <ol>
+          <li>Write scene prompts (cinematic, specific, visual)</li>
+          <li>Submit all scenes in parallel via Sora API (async jobs)</li>
+          <li>Poll for completion (~2-3 min each)</li>
+          <li>Download the clips</li>
+          <li>Stitch with ffmpeg: <code>ffmpeg -f concat -i list.txt -i song.mp3 -map 0:v -map 1:a -shortest output.mp4</code></li>
+        </ol>
+        <h3>Gotchas</h3>
+        <ul>
+          <li><strong>Sora's moderation is aggressive.</strong> "Epic like a perfume commercial" got blocked. Keep prompts descriptive but neutral.</li>
+          <li>The <code>/content</code> endpoint returns raw binary, not JSON with a URL — download directly.</li>
+          <li>Clips are exactly 12.1 seconds (not 12.0). Use <code>-shortest</code> flag to trim to the audio length.</li>
+          <li>3 parallel 12-second clips = ~36 seconds of footage for a 30-second song. Gives you some buffer.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="task" id="youtube-summarize">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">07</span>
+          <h2>YouTube Summarization</h2>
+        </div>
+        <p class="task-summary">Extract transcripts from YouTube videos and summarize them — as text or voice.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>The <code>summarize</code> CLI extracts transcripts from YouTube URLs. For long videos, we use <code>--extract-only</code> to get the transcript, then summarize in-context to avoid OOM kills.</p>
+        <h3>How it works</h3>
+        <ul>
+          <li><code>summarize --extract-only "youtube-url"</code> → raw transcript</li>
+          <li>Agent summarizes the transcript in-context (Claude handles this natively)</li>
+          <li>Optionally: generate a voice memo summary using the voice-memo skill</li>
+        </ul>
+        <h3>Gotchas</h3>
+        <ul>
+          <li><strong>Full summarization OOMs on long videos.</strong> A 2,733-line podcast transcript gets killed. Use <code>--extract-only</code> and summarize manually.</li>
+          <li>The <code>summarize</code> CLI handles YouTube natively — no need for <code>yt-dlp</code> just for transcripts.</li>
+          <li><code>yt-dlp</code> is only needed when you want the actual audio/video file (for stem splitting, etc.).</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="task" id="clamshell">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">08</span>
+          <h2>Clamshell Mode</h2>
+        </div>
+        <p class="task-summary">Keep the MacBook running with the lid closed — no external monitor needed.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>If you're running OpenClaw on a laptop and want to close the lid without it sleeping, you need to disable clamshell sleep. One command:</p>
+        <pre><code>sudo pmset -a disablesleep 1   # on
+sudo pmset -a disablesleep 0   # off</code></pre>
+        <h3>Gotchas</h3>
+        <ul>
+          <li><strong>Requires sudo.</strong> The agent can't run this without elevated permissions or your password.</li>
+          <li><strong>Turn it off when done!</strong> Your Mac won't sleep at all with the lid closed — battery drain is real.</li>
+          <li>Works on macOS Tahoe (26.x). No external display or keyboard required.</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Built by Paul & Waffle 🧇 — powered by <a href="https://openclaw.ai">OpenClaw</a> + Claude</p>
+      <p class="footer-note">This site is itself a product of the setup it describes. Updated as we build more stuff.</p>
+    </div>
+  </footer>
+
+  <script>
+    function toggleTask(header) {
+      const section = header.parentElement;
+      section.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>
