@@ -355,6 +355,63 @@ sudo pmset -a disablesleep 0   # off</code></pre>
       </div>
     </section>
 
+    <section class="task" id="x-search">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">11</span>
+          <h2>X/Twitter Research Tool</h2>
+        </div>
+        <p class="task-summary">Built a CLI for searching and analyzing X/Twitter discourse using Grok's x_search — adapted from OpenUniverse.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>We wanted to do real research on X/Twitter — not just search, but <em>analyze</em>. Topic sentiment, account positions, debate classification, all with proper citations. Inspired by Paul's earlier project <a href="https://github.com/AnthonyRonning/openuniverse">OpenUniverse</a>, we stripped it down to a single Python script that outputs markdown reports.</p>
+
+        <h3>What it does</h3>
+        <ul>
+          <li><strong>Search:</strong> Find top/viral tweets on any topic with engagement metrics</li>
+          <li><strong>Topic analysis:</strong> Define two "sides" of a debate, find tweets, classify them into camps (from OpenUniverse)</li>
+          <li><strong>Account analysis:</strong> Map someone's positions across configurable topics with tweet evidence</li>
+          <li><strong>Freeform ask:</strong> Natural language questions about any account, with cited sources</li>
+          <li><strong>Citations:</strong> Every claim links to a real tweet URL — no unsourced assertions</li>
+        </ul>
+
+        <h3>The approach</h3>
+        <p>The key insight: xAI's Grok model has a built-in <code>x_search</code> tool that can natively search X/Twitter. No separate Twitter API bearer token needed — just the xAI key. We use the <code>xai-sdk</code> Python package to send prompts with x_search enabled, and Grok does the searching and analysis in one shot.</p>
+        <p>OpenUniverse is a full-stack app (FastAPI + React + PostgreSQL + Chrome extension). We took the core ideas — topic classification, account analysis, side-by-side debate scoring — and packed them into a ~300-line Python CLI that outputs clean markdown. No database, no frontend, no server.</p>
+
+        <h3>First real test: Why is Bitcoin down?</h3>
+        <p>We investigated Bitcoin's 50% crash (Oct 2025 → Feb 2026) using a combo of web search (Brave API) for news articles and x-search for Twitter discourse. Found two competing narratives:</p>
+        <ul>
+          <li><strong>Camp A (Macro-driven):</strong> Tariffs, Fed hawkishness, geopolitical risk-off</li>
+          <li><strong>Camp B (Crypto-structural):</strong> Overleveraged positions, liquidation cascades, ETF outflows, cycle top</li>
+        </ul>
+        <p>The topic analysis tool classified 15+ viral tweets and found <strong>Camp B dominated overwhelmingly</strong> (9:1). Best take came from <a href="https://x.com/chigrl/status/1990584897703195018">@chigrl</a>: <em>"Everyone is looking for a single cause when this is actually a systems failure with multiple transmission mechanisms reinforcing each other."</em></p>
+
+        <h3>Key decisions</h3>
+        <ul>
+          <li><strong>Grok-4-1-fast only:</strong> Only the grok-4 family supports x_search. Tried grok-3-mini first — instant error.</li>
+          <li><strong>Citations mandatory:</strong> Every prompt enforces source linking. After our first draft report came back without links, we rewrote all prompts to demand <code>[text](url)</code> for every claim.</li>
+          <li><strong>No database (yet):</strong> SQLite caching is a future enhancement. For now, every query is fresh from Grok. Simple &gt; complex.</li>
+          <li><strong>Ask &gt; Topic for complex research:</strong> The two-step topic flow (find → classify) can break on JSON parsing. A single detailed "ask" prompt with classification instructions works more reliably.</li>
+        </ul>
+
+        <h3>Gotchas</h3>
+        <ul>
+          <li><strong>Don't search official accounts.</strong> Searching @bitcoin or @cryptocurrency for "why is bitcoin crashing" returns low-signal news aggregation. The real discourse is from individual analysts and traders.</li>
+          <li><strong>JSON parsing is fragile.</strong> Grok sometimes wraps JSON in markdown or returns slightly different formats. Our <code>extract_json()</code> helper handles most cases but isn't bulletproof.</li>
+          <li><strong>Blended research works best:</strong> Web search for facts + X search for vibes + synthesis = the most useful output.</li>
+          <li><strong>The <code>.env</code> file is more reliable than config:</strong> API keys in <code>~/.openclaw/.env</code> get picked up by the gateway process more reliably than <code>openclaw.json</code> config patches (which sometimes need a full restart).</li>
+        </ul>
+
+        <h3>Source</h3>
+        <ul>
+          <li><a href="https://github.com/waffledog-bot/paul-and-waffle/tree/main/skills/x-search">x-search skill on GitHub</a></li>
+          <li>Inspired by: <a href="https://github.com/AnthonyRonning/openuniverse">OpenUniverse</a></li>
+        </ul>
+      </div>
+    </section>
+
   </main>
 
   <footer>
