@@ -412,6 +412,138 @@ sudo pmset -a disablesleep 0   # off</code></pre>
       </div>
     </section>
 
+    <section class="task" id="cashu-wallet">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">12</span>
+          <h2>Cashu Ecash Wallet</h2>
+        </div>
+        <p class="task-summary">Bitcoin-backed ecash wallet for Lightning payments and privacy-preserving transactions — powered by the cocod CLI.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>We set up a Cashu ecash wallet so Waffle can send and receive Bitcoin/Lightning payments. Cashu uses blind signatures for privacy — the mint can't link who sent what to whom. The <code>cocod</code> CLI (installed from <a href="https://clawhub.com">ClawHub</a>) handles everything.</p>
+
+        <h3>What is Cashu?</h3>
+        <p>Cashu is a Chaumian ecash protocol. You deposit Bitcoin (via Lightning), and the mint gives you ecash tokens backed 1:1. These tokens can be transferred privately — the mint signs them with blind signatures, so it can't trace transactions. Think digital cash that's actually private.</p>
+
+        <h3>What it can do</h3>
+        <ul>
+          <li><strong>Lightning payments:</strong> Pay any Lightning invoice (bolt11) directly from the wallet</li>
+          <li><strong>Ecash transfers:</strong> Send/receive Cashu tokens — copy-paste a token string and it's done</li>
+          <li><strong>NUT-24 (HTTP 402):</strong> Automatically pay for API access when a server returns <code>402 Payment Required</code> with an <code>X-Cashu</code> header</li>
+          <li><strong>NPC Lightning addresses:</strong> Receive payments at a Lightning address tied to your Nostr pubkey</li>
+          <li><strong>Balance & history:</strong> Check balance, view transaction history</li>
+        </ul>
+
+        <h3>Setup</h3>
+        <pre><code># Install via bun
+bun install -g cocod
+
+# Initialize with a mint
+cocod init --mint-url https://mint.minibits.cash/Bitcoin
+
+# Check balance
+cocod balance</code></pre>
+
+        <h3>Gotchas</h3>
+        <ul>
+          <li><strong>Back up your mnemonic.</strong> The wallet generates a mnemonic on init — store it securely (<code>chmod 600</code>). Lose it and your ecash is gone.</li>
+          <li><strong>Mints are trusted custodians.</strong> Your ecash is only as good as the mint backing it. Use reputable mints.</li>
+          <li><strong>Skill came from ClawHub</strong> (<code>clawhub install cocod</code>) — community-maintained, version-pinned to the CLI release.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="task" id="fal-video">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">13</span>
+          <h2>Video Generation (fal.ai)</h2>
+        </div>
+        <p class="task-summary">Text-to-video and image-to-video using fal.ai — multiple models including Grok Imagine, Seedance, and Kling.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p class="skill-link">📦 <a href="https://github.com/waffledog-bot/paul-and-waffle/tree/main/skills/fal-video">fal-video skill</a></p>
+        <p>The <code>fal-video</code> skill wraps fal.ai's queue API to generate videos from text prompts or animate still images. It supports multiple models — each with different strengths — so you can pick the right tool for the job.</p>
+
+        <h3>Two modes</h3>
+        <ul>
+          <li><strong>Text-to-video:</strong> Describe what you want and get a video clip (4-12 seconds)</li>
+          <li><strong>Image-to-video:</strong> Upload a still image + a motion prompt to animate it</li>
+        </ul>
+
+        <h3>Available models</h3>
+        <ul>
+          <li><strong>Grok Imagine Video</strong> (default) — best overall quality as of Feb 2026</li>
+          <li><strong>Seedance 1.5 Pro</strong> — good audio generation, cinematic feel</li>
+          <li><strong>Kling 3.0 Pro</strong> — highest detail, largest file sizes</li>
+          <li><strong>Veo 3.1</strong> — Google's model, fixed 8-second duration</li>
+          <li><strong>LTX-2 19B</strong> — open source, high resolution (1408×768)</li>
+        </ul>
+
+        <h3>How it works</h3>
+        <pre><code># Text-to-video
+bash scripts/fal-video.sh text2video "A wolf howling at the moon" --model grok --duration 8
+
+# Image-to-video (animate a photo)
+bash scripts/fal-video.sh img2video "She turns and walks away" --image photo.jpg
+
+# Check result (async queue)
+bash scripts/fal-video.sh result &lt;request_id&gt; --model grok</code></pre>
+
+        <h3>Gotchas</h3>
+        <ul>
+          <li><strong>Async queue model.</strong> You submit a job, get a request ID, then poll for the result. Generation takes 30s–3min depending on model and duration.</li>
+          <li><strong>Different models, different strengths.</strong> Grok is the default for a reason, but Seedance handles audio better and Kling produces the most detailed output. Experiment.</li>
+          <li><strong>Aspect ratios and resolution</strong> are configurable — 16:9, 9:16 (vertical), 1:1 (square), etc. Default is 720p.</li>
+          <li>Requires <code>FAL_KEY</code> environment variable.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="task" id="suno-music">
+      <div class="task-header" onclick="toggleTask(this)">
+        <div>
+          <span class="task-number">14</span>
+          <h2>Suno (Browser-Automated Music)</h2>
+        </div>
+        <p class="task-summary">Generate music on Suno via browser automation — idea mode, covers from audio references, and clip extensions.</p>
+        <span class="expand-icon">+</span>
+      </div>
+      <div class="task-details">
+        <p>Unlike the ElevenLabs music-gen skill (API-based), the Suno skill drives <a href="https://suno.com">suno.com</a> directly through browser automation. This gives access to Suno's full feature set — including covers from audio references, which is great for turning voice memos or hums into full songs.</p>
+
+        <h3>Three modes</h3>
+        <ul>
+          <li><strong>Idea:</strong> Text prompt only — write lyrics and style tags, Suno generates the song. Simplest mode.</li>
+          <li><strong>Cover:</strong> Upload an audio clip as a reference. Suno recreates it in a new style while trying to match the melody and structure. Perfect for turning a hummed melody or voice memo into a produced track.</li>
+          <li><strong>Extend:</strong> Continue an existing Suno clip from where it left off — make songs longer or create variations.</li>
+        </ul>
+
+        <h3>How it works</h3>
+        <p>This is pure browser automation — no API. The agent navigates to <code>suno.com/create</code>, switches to Custom mode, fills in lyrics and style tags, clicks Create, then polls until the clips are ready. Downloads from Suno's CDN.</p>
+
+        <h3>Cover mode flow</h3>
+        <ol>
+          <li>Navigate to Create page, switch to Custom mode</li>
+          <li>Click Audio → Upload the reference audio file</li>
+          <li>Trim if needed, select "Cover" condition type</li>
+          <li>Optionally add lyrics and style tags (or let Suno auto-generate)</li>
+          <li>Create → wait → download</li>
+        </ol>
+
+        <h3>Gotchas</h3>
+        <ul>
+          <li><strong>Requires browser login.</strong> The OpenClaw internal browser (<code>profile: openclaw</code>) must be logged into Suno first. No API key — it's session-based.</li>
+          <li><strong>Upload triggers native file picker.</strong> The browser upload works but leaves macOS's native file dialog open — may need manual dismissal. Known issue we're still working around.</li>
+          <li><strong>Two music tools, different strengths:</strong> ElevenLabs (music-gen) is better for precise composition plans with per-section control. Suno is better for covers, audio references, and when you want that "Suno sound."</li>
+          <li>Clips download from <code>https://cdn1.suno.ai/{clip_id}.mp3</code> once ready (~60-90 seconds).</li>
+        </ul>
+      </div>
+    </section>
+
   </main>
 
   <footer>
